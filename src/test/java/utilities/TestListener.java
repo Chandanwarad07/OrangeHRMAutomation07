@@ -1,30 +1,40 @@
 package utilities;
 
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+
 import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.reporter.ExtentSparkReporter;
+import com.aventstack.extentreports.ExtentTest;
 
-public class ExtentManager {
+public class TestListener implements ITestListener {
 
-    private static ExtentReports extent;
+    private static ExtentReports extent = ExtentManager.getInstance();
+    private static ThreadLocal<ExtentTest> test = new ThreadLocal<>();
 
-    public static ExtentReports getInstance() {
+    @Override
+    public void onTestStart(ITestResult result) {
+        ExtentTest extentTest = extent.createTest(result.getMethod().getMethodName());
+        test.set(extentTest);
+    }
 
-        if (extent == null) {
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        test.get().pass("Test Passed");
+    }
 
-            ExtentSparkReporter spark =
-                    new ExtentSparkReporter("reports/ExtentReport.html");
+    @Override
+    public void onTestFailure(ITestResult result) {
+        test.get().fail(result.getThrowable());
+    }
 
-            spark.config().setReportName("OrangeHRM Automation Report");
-            spark.config().setDocumentTitle("Automation Test Report");
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        test.get().skip("Test Skipped");
+    }
 
-            extent = new ExtentReports();
-            extent.attachReporter(spark);
-
-            extent.setSystemInfo("Tester", "Chandan Kumar");
-            extent.setSystemInfo("Project", "OrangeHRM Automation");
-            extent.setSystemInfo("Browser", "Chrome");
-        }
-
-        return extent;
+    @Override
+    public void onFinish(ITestContext context) {
+        extent.flush();
     }
 }
