@@ -1,20 +1,30 @@
 package utilities;
 
-import org.testng.ITestContext;
-import org.testng.ITestListener;
-import org.testng.ITestResult;
+import com.aventstack.extentreports.ExtentReports;
+import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 
-public class TestListener implements ITestListener {
+public class ExtentManager {
 
-    @Override
-    public void onTestStart(ITestResult result) {}
+    private static ExtentReports extent;
 
-    @Override
-    public void onTestSuccess(ITestResult result) {}
+    public static ExtentReports getInstance() {
 
-    @Override
-    public void onTestFailure(ITestResult result) {}
+        if (extent == null) {
 
-    @Override
-    public void onFinish(ITestContext context) {}
+            ExtentSparkReporter spark =
+                    new ExtentSparkReporter("reports/ExtentReport.html");
+
+            spark.config().setReportName("OrangeHRM Automation Report");
+            spark.config().setDocumentTitle("Automation Test Report");
+
+            extent = new ExtentReports();
+            extent.attachReporter(spark);
+
+            extent.setSystemInfo("Tester", "Chandan Kumar");
+            extent.setSystemInfo("Project", "OrangeHRM Automation");
+            extent.setSystemInfo("Browser", "Chrome");
+        }
+
+        return extent;
+    }
 }
