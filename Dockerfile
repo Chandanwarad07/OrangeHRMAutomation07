@@ -10,6 +10,6 @@ RUN apt-get update && \
 
 COPY . .
 
-RUN mvn clean install
+RUN mvn clean install -DskipTests
 
-CMD ["mvn", "test"]
+CMD ["mvn","test"]
