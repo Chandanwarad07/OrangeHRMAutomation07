@@ -11,31 +11,47 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo 'Checking out source code...'
                 checkout scm
             }
         }
 
         stage('Build') {
             steps {
-                bat 'java -version'
-                bat 'mvn -version'
                 bat 'mvn clean install'
             }
         }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+
+                    withSonarQubeEnv('SonarQube') {
+
+                        bat """
+                        "${scannerHome}\\bin\\sonar-scanner.bat" ^
+                        -Dsonar.projectKey=OrangeHRMAutomation ^
+                        -Dsonar.projectName=OrangeHRMAutomation ^
+                        -Dsonar.sources=src ^
+                        -Dsonar.host.url=http://localhost:9000
+                        """
+                    }
+                }
+            }
+        }
+
     }
 
     post {
-        always {
-            echo 'Pipeline Finished'
-        }
 
         success {
-            echo 'Build Successful'
+            echo 'Pipeline Success'
         }
 
         failure {
-            echo 'Build Failed'
+            echo 'Pipeline Failed'
         }
+
     }
+
 }
