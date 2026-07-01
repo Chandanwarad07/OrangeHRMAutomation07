@@ -24,7 +24,6 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-
                     def scannerHome = tool 'SonarScanner'
 
                     withSonarQubeEnv('SonarQube') {
@@ -36,16 +35,13 @@ pipeline {
                         -Dsonar.sources=src ^
                         -Dsonar.java.binaries=target
                         """
-
                     }
                 }
             }
         }
-
     }
 
     post {
-
         success {
             echo 'Pipeline Success'
         }
@@ -53,7 +49,5 @@ pipeline {
         failure {
             echo 'Pipeline Failed'
         }
-
     }
-
 }
