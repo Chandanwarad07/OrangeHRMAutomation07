@@ -27,14 +27,16 @@ pipeline {
                     def scannerHome = tool 'SonarScanner'
 
                     withSonarQubeEnv('SonarQube') {
-
-                        bat """
-                        "${scannerHome}\\bin\\sonar-scanner.bat" ^
-                        -Dsonar.projectKey=OrangeHRMAutomation ^
-                        -Dsonar.projectName=OrangeHRMAutomation ^
-                        -Dsonar.sources=src ^
-                        -Dsonar.java.binaries=target
-                        """
+                        withCredentials([string(credentialsId: 'sonar-token-orangehrm', variable: 'SONAR_TOKEN')]) {
+                            bat """
+                            "${scannerHome}\\bin\\sonar-scanner.bat" ^
+                            -Dsonar.projectKey=OrangeHRMAutomation ^
+                            -Dsonar.projectName=OrangeHRMAutomation ^
+                            -Dsonar.sources=src ^
+                            -Dsonar.java.binaries=target ^
+                            -Dsonar.token=%SONAR_TOKEN%
+                            """
+                        }
                     }
                 }
             }
