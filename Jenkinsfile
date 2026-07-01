@@ -3,8 +3,8 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK17'
-        maven 'Maven'
+        jdk 'java'
+        maven 'maven'
     }
 
     stages {
@@ -18,11 +18,11 @@ pipeline {
 
         stage('Build') {
             steps {
-                echo 'Running Maven Build...'
+                bat 'java -version'
+                bat 'mvn -version'
                 bat 'mvn clean install'
             }
         }
-
     }
 
     post {
