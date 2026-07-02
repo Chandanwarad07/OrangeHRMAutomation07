@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orangehrm
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: orangehrm
+  template:
+    metadata:
+      labels:
+        app: orangehrm
+    spec:
+      containers:
+      - name: orangehrm
+        image: chandanwarad07/orangehrm-automation:v1
+        imagePullPolicy: Always
