@@ -1,0 +1,25 @@
+# Maven
+target/
+
+# TestNG
+test-output/
+
+# Reports
+reports/
+
+# Eclipse
+.settings/
+.classpath
+.project
+
+# IntelliJ
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
