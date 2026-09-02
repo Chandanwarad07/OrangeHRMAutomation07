@@ -15,7 +15,10 @@ public class DashboardPage extends BasePage {
     WebElement dashboardTitle;
 
     public boolean isDashboardDisplayed() {
-        return dashboardTitle.isDisplayed();
+        org.openqa.selenium.support.ui.WebDriverWait wait =
+                new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(20));
+        return wait.until(org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated(
+                org.openqa.selenium.By.xpath("//h6[text()='Dashboard'] | //h6[contains(.,'Dashboard')]"))).isDisplayed();
     }
 
 }

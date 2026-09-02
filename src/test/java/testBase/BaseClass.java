@@ -10,6 +10,8 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
@@ -29,45 +31,62 @@ public class BaseClass {
                 new FileInputStream("src/test/resources/config.properties");
 
         p.load(file);
+        file.close();
 
-        driver = new ChromeDriver();
+        // Browser selection
+        if (browser.equalsIgnoreCase("chrome")) {
+
+            driver = new ChromeDriver();
+
+        } else if (browser.equalsIgnoreCase("edge")) {
+
+            driver = new EdgeDriver();
+
+        } else if (browser.equalsIgnoreCase("firefox")) {
+
+            driver = new FirefoxDriver();
+
+        } else {
+
+            throw new IllegalArgumentException(
+                    "Browser is not supported: " + browser);
+        }
 
         driver.manage().window().maximize();
 
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().timeouts()
+              .implicitlyWait(Duration.ofSeconds(10));
 
         driver.get(p.getProperty("appURL"));
-        
-        
-
     }
 
     public String captureScreenshot(String testName) {
 
-        TakesScreenshot ts=(TakesScreenshot)driver;
+        TakesScreenshot ts = (TakesScreenshot) driver;
 
-        File source=ts.getScreenshotAs(OutputType.FILE);
+        File source = ts.getScreenshotAs(OutputType.FILE);
 
-        String path=System.getProperty("user.dir")
-                +"\\screenshots\\"+testName+".png";
+        String path = System.getProperty("user.dir")
+                + "\\screenshots\\" + testName + ".png";
 
-        try{
-            org.openqa.selenium.io.FileHandler.copy(source,new File(path));
-        }
-        catch(Exception e){
+        try {
+
+            org.openqa.selenium.io.FileHandler.copy(
+                    source, new File(path));
+
+        } catch (Exception e) {
+
             e.printStackTrace();
         }
 
         return path;
-
     }
 
     @AfterClass
     public void tearDown() {
 
-        if(driver!=null)
+        if (driver != null) {
             driver.quit();
-
+        }
     }
-
 }

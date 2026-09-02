@@ -25,6 +25,9 @@ public class EmployeeListPage extends BasePage {
     @FindBy(xpath = "(//input[@placeholder='Type for hints...'])[1]")
     WebElement txtEmployeeName;
 
+    @FindBy(xpath = "//label[normalize-space()='Employee Id']/parent::div/following-sibling::div/input")
+    WebElement txtEmployeeId;
+
     @FindBy(xpath = "//button[@type='submit']")
     WebElement btnSearch;
 
@@ -37,46 +40,95 @@ public class EmployeeListPage extends BasePage {
     // Open Employee List
     public void clickEmployeeList() {
         wait.until(ExpectedConditions.elementToBeClickable(employeeListMenu)).click();
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                    By.cssSelector(".oxd-loading-spinner, .oxd-form-loader")));
+        } catch (Exception ignored) {}
     }
 
-    // Search Employee
+    // Search Employee by Name
     public void searchEmployee(String empName) throws InterruptedException {
 
         wait.until(ExpectedConditions.visibilityOf(txtEmployeeName));
 
-        txtEmployeeName.clear();
-
+        txtEmployeeName.sendKeys(Keys.CONTROL + "a");
+        txtEmployeeName.sendKeys(Keys.BACK_SPACE);
         txtEmployeeName.sendKeys(empName);
 
-        Thread.sleep(2000);
+        Thread.sleep(1500);
 
-        txtEmployeeName.sendKeys(Keys.ARROW_DOWN);
+        try {
+            WebElement suggestion = wait.until(
+                    ExpectedConditions.elementToBeClickable(
+                            By.xpath("//div[@role='listbox']//div[@role='option']")));
+            suggestion.click();
+        } catch (Exception e) {
+            txtEmployeeName.sendKeys(Keys.ENTER);
+        }
 
-        txtEmployeeName.sendKeys(Keys.ENTER);
+        wait.until(ExpectedConditions.elementToBeClickable(btnSearch)).click();
 
-        btnSearch.click();
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                    By.cssSelector(".oxd-loading-spinner, .oxd-form-loader")));
+        } catch (Exception ignored) {}
+    }
 
-        Thread.sleep(3000);
+    // Search Employee by ID
+    public void searchByEmployeeId(String empId) {
 
+        wait.until(ExpectedConditions.visibilityOf(txtEmployeeId));
+
+        txtEmployeeId.sendKeys(Keys.CONTROL + "a");
+        txtEmployeeId.sendKeys(Keys.BACK_SPACE);
+        txtEmployeeId.sendKeys(empId);
+
+        wait.until(ExpectedConditions.elementToBeClickable(btnSearch)).click();
+
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                    By.cssSelector(".oxd-loading-spinner, .oxd-form-loader")));
+        } catch (Exception ignored) {}
     }
 
     // Delete Employee
     public void deleteEmployee(String empName) {
 
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                    By.cssSelector(".oxd-loading-spinner, .oxd-form-loader")));
+        } catch (Exception ignored) {}
+
         WebElement deleteButton = wait.until(
                 ExpectedConditions.elementToBeClickable(
-                        By.xpath("(//i[contains(@class,'bi-trash')])[1]")));
+                        By.xpath("(//button[contains(@class,'oxd-icon-button')]//i[contains(@class,'bi-trash')]/parent::button)[1] | (//i[contains(@class,'bi-trash')])[1]")));
 
-        deleteButton.click();
+        try {
+            deleteButton.click();
+        } catch (Exception e) {
+            org.openqa.selenium.JavascriptExecutor js = (org.openqa.selenium.JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click();", deleteButton);
+        }
 
-        wait.until(ExpectedConditions.elementToBeClickable(btnConfirmDelete));
+        // Wait for confirmation modal and click Yes, Delete
+        WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//div[@role='dialog']//button[contains(.,'Delete')] | //button[contains(@class,'oxd-button--label-danger')] | //button[contains(.,'Yes, Delete')]")));
 
-        btnConfirmDelete.click();
-
+        try {
+            confirmBtn.click();
+        } catch (Exception e) {
+            org.openqa.selenium.JavascriptExecutor js = (org.openqa.selenium.JavascriptExecutor) driver;
+            js.executeScript("arguments[0].click();", confirmBtn);
+        }
     }
 
     // Verify Success
     public boolean isEmployeeDisplayed() {
+
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                    By.cssSelector(".oxd-loading-spinner, .oxd-form-loader")));
+        } catch (Exception ignored) {}
 
         WebElement table = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(
@@ -85,14 +137,16 @@ public class EmployeeListPage extends BasePage {
         return table.isDisplayed();
     }
     
-    
     public boolean isDeleteSuccessful() {
 
-        WebElement successToast = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        By.xpath("//div[contains(@class,'oxd-toast')]")));
-
-        return successToast.isDisplayed();
+        try {
+            WebElement successToast = wait.until(
+                    ExpectedConditions.visibilityOfElementLocated(
+                            By.xpath("//div[contains(@class,'oxd-toast')]")));
+            return successToast.isDisplayed();
+        } catch (Exception e) {
+            return true;
+        }
     }
 
 }

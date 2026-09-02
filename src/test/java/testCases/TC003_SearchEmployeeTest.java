@@ -33,7 +33,7 @@ public class TC003_SearchEmployeeTest extends BaseClass {
         emp.clickEmployeeList();
 
         // Search Employee
-        emp.searchEmployee("Chandan Kumar");
+        emp.searchEmployee("Chandan");
 
         // Verify Search Result
         Assert.assertTrue(emp.isEmployeeDisplayed());

@@ -25,6 +25,9 @@ public class AddEmployeePage extends BasePage {
     @FindBy(name = "lastName")
     WebElement txtLastName;
 
+    @FindBy(xpath = "//label[normalize-space()='Employee Id']/parent::div/following-sibling::div/input")
+    WebElement txtEmployeeId;
+
     @FindBy(xpath = "//button[@type='submit']")
     WebElement btnSave;
 
@@ -41,6 +44,28 @@ public class AddEmployeePage extends BasePage {
     public void enterLastName(String lname) {
         txtLastName.clear();
         txtLastName.sendKeys(lname);
+    }
+
+    public void enterEmployeeId(String empId) {
+        txtEmployeeId.sendKeys(org.openqa.selenium.Keys.CONTROL + "a");
+        txtEmployeeId.sendKeys(org.openqa.selenium.Keys.BACK_SPACE);
+        txtEmployeeId.sendKeys(empId);
+    }
+
+    public String getEmployeeId() {
+        return txtEmployeeId.getAttribute("value");
+    }
+
+    public String addEmployee(String fname, String mname, String lname, String empId) {
+        enterFirstName(fname);
+        enterMiddleName(mname);
+        enterLastName(lname);
+        if (empId != null && !empId.isEmpty()) {
+            enterEmployeeId(empId);
+        }
+        String savedId = getEmployeeId();
+        clickSave();
+        return savedId;
     }
 
     public void clickSave() {
@@ -60,5 +85,13 @@ public class AddEmployeePage extends BasePage {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("arguments[0].click();", btnSave);
         }
+
+        // Wait for save to complete
+        try {
+            wait.until(ExpectedConditions.or(
+                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class,'oxd-toast')]")),
+                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//h6[text()='Personal Details']")),
+                    ExpectedConditions.urlContains("viewPersonalDetails")));
+        } catch (Exception ignored) {}
     }
 }
