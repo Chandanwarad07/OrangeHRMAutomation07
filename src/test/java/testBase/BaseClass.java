@@ -23,7 +23,7 @@ public class BaseClass {
 
     @BeforeClass
     @Parameters("browser")
-    public void setup(String browser) throws IOException {
+    public void setup(@org.testng.annotations.Optional("chrome") String browser) throws IOException {
 
         p = new Properties();
 
@@ -34,17 +34,49 @@ public class BaseClass {
         file.close();
 
         // Browser selection
+        String headless = System.getProperty("headless", p.getProperty("headless", "false"));
+        boolean isCI = System.getenv("JENKINS_HOME") != null || System.getenv("CI") != null;
+
         if (browser.equalsIgnoreCase("chrome")) {
 
-            driver = new ChromeDriver();
+            io.github.bonigarcia.wdm.WebDriverManager.chromedriver().setup();
+            org.openqa.selenium.chrome.ChromeOptions options = new org.openqa.selenium.chrome.ChromeOptions();
+            options.addArguments("--remote-allow-origins=*");
+            options.addArguments("--disable-notifications");
+
+            if ("true".equalsIgnoreCase(headless) || isCI) {
+                options.addArguments("--headless=new");
+                options.addArguments("--no-sandbox");
+                options.addArguments("--disable-dev-shm-usage");
+                options.addArguments("--disable-gpu");
+                options.addArguments("--window-size=1920,1080");
+            }
+
+            driver = new ChromeDriver(options);
 
         } else if (browser.equalsIgnoreCase("edge")) {
 
-            driver = new EdgeDriver();
+            io.github.bonigarcia.wdm.WebDriverManager.edgedriver().setup();
+            org.openqa.selenium.edge.EdgeOptions options = new org.openqa.selenium.edge.EdgeOptions();
+
+            if ("true".equalsIgnoreCase(headless) || isCI) {
+                options.addArguments("--headless=new");
+                options.addArguments("--no-sandbox");
+                options.addArguments("--disable-dev-shm-usage");
+            }
+
+            driver = new EdgeDriver(options);
 
         } else if (browser.equalsIgnoreCase("firefox")) {
 
-            driver = new FirefoxDriver();
+            io.github.bonigarcia.wdm.WebDriverManager.firefoxdriver().setup();
+            org.openqa.selenium.firefox.FirefoxOptions options = new org.openqa.selenium.firefox.FirefoxOptions();
+
+            if ("true".equalsIgnoreCase(headless) || isCI) {
+                options.addArguments("--headless");
+            }
+
+            driver = new FirefoxDriver(options);
 
         } else {
 
@@ -67,9 +99,14 @@ public class BaseClass {
         File source = ts.getScreenshotAs(OutputType.FILE);
 
         String path = System.getProperty("user.dir")
-                + "\\screenshots\\" + testName + ".png";
+                + File.separator + "screenshots" + File.separator + testName + ".png";
 
         try {
+
+            File destDir = new File(System.getProperty("user.dir") + File.separator + "screenshots");
+            if (!destDir.exists()) {
+                destDir.mkdirs();
+            }
 
             org.openqa.selenium.io.FileHandler.copy(
                     source, new File(path));
