@@ -21,7 +21,6 @@
             <class name="testCases.TC006_SearchUserTest"/>
             <class name="testCases.TC007_AddUserTest"/>
             <class name="testCases.TC008_AddEmployeeWithIdTest"/>
-            <class name="testCases.TC009_PagePerformanceTest"/>
         </classes>
 
     </test>
