@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: orangehrm-automation-job
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app: orangehrm-test
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: test-runner
+        image: 399747939119.dkr.ecr.ap-south-1.amazonaws.com/test-images:latest
+        imagePullPolicy: Always
+        env:
+        - name: CI
+          value: "true"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1500m"

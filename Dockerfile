@@ -1,94 +1,25 @@
-pipeline {
-    agent any
+FROM maven:3.9.6-eclipse-temurin-17
 
-    environment {
-        GIT_REPO = 'https://github.com/Chandanwarad07/Jenkinsandjava.git'
-        AWS_REGION = 'ap-south-1'
-        AWS_ACCOUNT_ID = '399747939119'
-        ECR_REPO_NAME = 'test-images'
-        IMAGE_TAG = 'latest'
-        IMAGE_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
-    }
+WORKDIR /app
 
-    stages {
-        stage('Check Tools') {
-            steps {
-                sh '''
-                    set -e
-                    java -version
-                    git --version
-                    mvn -version
-                    docker --version
-                    aws --version
-                '''
-            }
-        }
+# Install dependencies and Google Chrome
+RUN apt-get update && \
+    apt-get install -y wget unzip curl gnupg fonts-liberation libasound2 libgbm1 libnspr4 libnss3 xdg-utils && \
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+    apt-get install -y ./google-chrome-stable_current_amd64.deb && \
+    rm google-chrome-stable_current_amd64.deb && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-        stage('Clone Repository') {
-            steps {
-                git branch: 'main', url: "${GIT_REPO}"
-            }
-        }
+# Copy Maven files and prefetch dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline -B || true
 
-        stage('Build Java Application') {
-            steps {
-                sh '''
-                    set -e
-                    echo "Building Java application..."
-                    mvn clean -B -Denforcer.skip=true package
-                    ls -lh target/
-                '''
-            }
-        }
+# Copy source code and testng suite
+COPY src ./src
+COPY testng.xml .
 
-        stage('Check AWS IAM Role') {
-            steps {
-                sh '''
-                    set -e
-                    aws sts get-caller-identity --region "$AWS_REGION"
-                '''
-            }
-        }
+# Pre-compile test code
+RUN mvn clean test-compile -DskipTests
 
-        stage('Login to AWS ECR') {
-            steps {
-                sh '''
-                    set -e
-                    aws ecr get-login-password \
-                        --region "$AWS_REGION" |
-                    docker login \
-                        --username AWS \
-                        --password-stdin \
-                        "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-                '''
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh '''
-                    set -e
-                    docker build -t "$IMAGE_URI" .
-                '''
-            }
-        }
-
-        stage('Push Docker Image to ECR') {
-            steps {
-                sh '''
-                    set -e
-                    docker push "$IMAGE_URI"
-                '''
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'SUCCESS: Image pushed to private ECR project1.'
-        }
-        failure {
-            echo 'FAILURE: Check the failed stage in Console Output.'
-        }
-    }
-}
+# Run tests in headless mode by default
+CMD ["mvn", "test", "-Dheadless=true"]

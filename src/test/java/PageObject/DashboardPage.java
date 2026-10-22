@@ -1,24 +1,28 @@
 package PageObject;
 
+import java.time.Duration;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class DashboardPage extends BasePage {
 
-    // Constructor
+    private WebDriverWait wait;
+
     public DashboardPage(WebDriver driver) {
         super(driver);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
-    @FindBy(xpath = "//h6[text()='Dashboard']")
-    WebElement dashboardTitle;
+    @FindBy(xpath = "//h6[normalize-space()='Dashboard']")
+    private WebElement dashboardTitle;
 
     public boolean isDashboardDisplayed() {
-        org.openqa.selenium.support.ui.WebDriverWait wait =
-                new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(20));
-        return wait.until(org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated(
-                org.openqa.selenium.By.xpath("//h6[text()='Dashboard'] | //h6[contains(.,'Dashboard')]"))).isDisplayed();
+        return wait.until(
+                ExpectedConditions.visibilityOf(dashboardTitle)
+        ).isDisplayed();
     }
-
 }
