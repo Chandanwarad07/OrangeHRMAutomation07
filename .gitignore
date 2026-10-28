@@ -26,3 +26,5 @@ reports/
 
 # Selenium Screenshots
 screenshots/
+# Modernize hooks
+.github/modernize/

@@ -4,6 +4,7 @@ import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -32,23 +33,28 @@ public class AddEmployeePage extends BasePage {
     WebElement btnSave;
 
     public void enterFirstName(String fname) {
-        txtFirstName.clear();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        wait.until(ExpectedConditions.visibilityOf(txtFirstName));
+        txtFirstName.sendKeys(Keys.CONTROL + "a");
+        txtFirstName.sendKeys(Keys.BACK_SPACE);
         txtFirstName.sendKeys(fname);
     }
 
     public void enterMiddleName(String mname) {
-        txtMiddleName.clear();
+        txtMiddleName.sendKeys(Keys.CONTROL + "a");
+        txtMiddleName.sendKeys(Keys.BACK_SPACE);
         txtMiddleName.sendKeys(mname);
     }
 
     public void enterLastName(String lname) {
-        txtLastName.clear();
+        txtLastName.sendKeys(Keys.CONTROL + "a");
+        txtLastName.sendKeys(Keys.BACK_SPACE);
         txtLastName.sendKeys(lname);
     }
 
     public void enterEmployeeId(String empId) {
-        txtEmployeeId.sendKeys(org.openqa.selenium.Keys.CONTROL + "a");
-        txtEmployeeId.sendKeys(org.openqa.selenium.Keys.BACK_SPACE);
+        txtEmployeeId.sendKeys(Keys.CONTROL + "a");
+        txtEmployeeId.sendKeys(Keys.BACK_SPACE);
         txtEmployeeId.sendKeys(empId);
     }
 
@@ -73,8 +79,10 @@ public class AddEmployeePage extends BasePage {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
         // Wait for OrangeHRM loading overlay to disappear
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(
-                By.cssSelector(".oxd-form-loader")));
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                    By.cssSelector(".oxd-form-loader")));
+        } catch (Exception ignored) {}
 
         // Wait until Save button is clickable
         wait.until(ExpectedConditions.elementToBeClickable(btnSave));
@@ -90,8 +98,21 @@ public class AddEmployeePage extends BasePage {
         try {
             wait.until(ExpectedConditions.or(
                     ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class,'oxd-toast')]")),
-                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//h6[text()='Personal Details']")),
+                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//h6[normalize-space()='Personal Details']")),
                     ExpectedConditions.urlContains("viewPersonalDetails")));
         } catch (Exception ignored) {}
+    }
+
+    public boolean isEmployeeAdded() {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+            return wait.until(ExpectedConditions.or(
+                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//h6[normalize-space()='Personal Details']")),
+                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class,'oxd-toast')]")),
+                    ExpectedConditions.urlContains("viewPersonalDetails")
+            ));
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

@@ -22,7 +22,7 @@ public class TC002_AddEmployeeTest extends BaseClass {
 
         DashboardPage dp = new DashboardPage(driver);
 
-        Assert.assertTrue(dp.isDashboardDisplayed());
+        Assert.assertTrue(dp.isDashboardDisplayed(), "Dashboard should be displayed after login");
 
         PIMPage pim = new PIMPage(driver);
 
@@ -42,5 +42,6 @@ public class TC002_AddEmployeeTest extends BaseClass {
 
         captureScreenshot("EmployeeAdded");
 
+        Assert.assertTrue(emp.isEmployeeAdded(), "Employee should be added successfully");
     }
 }

@@ -20,7 +20,7 @@ public class AdminPage extends BasePage {
 
     // ================= MENU =================
 
-    @FindBy(xpath = "//span[text()='Admin']")
+    @FindBy(xpath = "//a[contains(@href,'viewAdminModule')] | //span[text()='Admin']")
     WebElement adminMenu;
 
     // ================= SEARCH USER =================
@@ -77,7 +77,12 @@ public class AdminPage extends BasePage {
     // ================= COMMON METHODS =================
 
     public void clickAdmin() {
-        wait.until(ExpectedConditions.elementToBeClickable(adminMenu)).click();
+        wait.until(ExpectedConditions.elementToBeClickable(adminMenu));
+        try {
+            adminMenu.click();
+        } catch (Exception e) {
+            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", adminMenu);
+        }
     }
 
     // ================= SEARCH USER =================
