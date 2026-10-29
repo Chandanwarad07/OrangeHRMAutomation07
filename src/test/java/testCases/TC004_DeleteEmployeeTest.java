@@ -41,8 +41,10 @@ public class TC004_DeleteEmployeeTest extends BaseClass {
         EmployeeListPage emp = new EmployeeListPage(driver);
 
         emp.clickEmployeeList();
+        Thread.sleep(1500);
 
         emp.searchByEmployeeId(savedEmpId);
+        Thread.sleep(1500);
 
         // 3. Delete the employee
         emp.deleteEmployee(firstName);

@@ -71,6 +71,7 @@ public class AddEmployeePage extends BasePage {
         }
         String savedId = getEmployeeId();
         clickSave();
+        isEmployeeAdded();
         return savedId;
     }
 
@@ -101,11 +102,10 @@ public class AddEmployeePage extends BasePage {
             return wait.until(ExpectedConditions.or(
                     ExpectedConditions.visibilityOfElementLocated(By.xpath("//h6[normalize-space()='Personal Details']")),
                     ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class,'oxd-toast')]")),
-                    ExpectedConditions.urlContains("viewPersonalDetails"),
-                    ExpectedConditions.urlContains("pim")
+                    ExpectedConditions.urlContains("viewPersonalDetails")
             ));
         } catch (Exception e) {
-            return driver.getCurrentUrl().contains("viewPersonalDetails") || driver.getCurrentUrl().contains("pim");
+            return driver.getCurrentUrl().contains("viewPersonalDetails");
         }
     }
 }
