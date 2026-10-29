@@ -16,7 +16,7 @@ public class EmployeeListPage extends BasePage {
 
     public EmployeeListPage(WebDriver driver) {
         super(driver);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(25));
     }
 
     @FindBy(xpath = "//a[text()='Employee List']")

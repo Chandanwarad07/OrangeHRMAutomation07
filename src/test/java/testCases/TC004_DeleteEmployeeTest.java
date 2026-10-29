@@ -29,12 +29,13 @@ public class TC004_DeleteEmployeeTest extends BaseClass {
 
         pim.clickPIM();
 
-        // 1. Create a dedicated employee with auto-generated ID
+        // 1. Create a dedicated employee with a unique ID
         pim.clickAddEmployee();
         AddEmployeePage addEmp = new AddEmployeePage(driver);
         String firstName = "TempDel" + (System.currentTimeMillis() % 1000);
         String lastName = "User";
-        String savedEmpId = addEmp.addEmployee(firstName, "", lastName, "");
+        String uniqueEmpId = String.valueOf(System.currentTimeMillis() % 100000);
+        String savedEmpId = addEmp.addEmployee(firstName, "", lastName, uniqueEmpId);
 
         // 2. Search for the employee by ID
         EmployeeListPage emp = new EmployeeListPage(driver);
@@ -49,7 +50,5 @@ public class TC004_DeleteEmployeeTest extends BaseClass {
         Assert.assertTrue(emp.isDeleteSuccessful());
 
         captureScreenshot("DeleteEmployee");
-
     }
-
 }

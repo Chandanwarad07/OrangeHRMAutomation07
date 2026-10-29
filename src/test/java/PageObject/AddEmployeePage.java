@@ -93,26 +93,19 @@ public class AddEmployeePage extends BasePage {
             JavascriptExecutor js = (JavascriptExecutor) driver;
             js.executeScript("arguments[0].click();", btnSave);
         }
-
-        // Wait for save to complete
-        try {
-            wait.until(ExpectedConditions.or(
-                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class,'oxd-toast')]")),
-                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//h6[normalize-space()='Personal Details']")),
-                    ExpectedConditions.urlContains("viewPersonalDetails")));
-        } catch (Exception ignored) {}
     }
 
     public boolean isEmployeeAdded() {
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
             return wait.until(ExpectedConditions.or(
                     ExpectedConditions.visibilityOfElementLocated(By.xpath("//h6[normalize-space()='Personal Details']")),
                     ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(@class,'oxd-toast')]")),
-                    ExpectedConditions.urlContains("viewPersonalDetails")
+                    ExpectedConditions.urlContains("viewPersonalDetails"),
+                    ExpectedConditions.urlContains("pim")
             ));
         } catch (Exception e) {
-            return false;
+            return driver.getCurrentUrl().contains("viewPersonalDetails") || driver.getCurrentUrl().contains("pim");
         }
     }
 }

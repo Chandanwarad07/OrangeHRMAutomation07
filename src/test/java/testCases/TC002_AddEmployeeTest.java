@@ -38,10 +38,13 @@ public class TC002_AddEmployeeTest extends BaseClass {
 
         emp.enterLastName("Warad");
 
+        String uniqueEmpId = String.valueOf(System.currentTimeMillis() % 100000);
+        emp.enterEmployeeId(uniqueEmpId);
+
         emp.clickSave();
 
-        captureScreenshot("EmployeeAdded");
-
         Assert.assertTrue(emp.isEmployeeAdded(), "Employee should be added successfully");
+
+        captureScreenshot("EmployeeAdded");
     }
 }

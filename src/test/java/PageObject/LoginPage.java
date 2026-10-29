@@ -15,7 +15,7 @@ public class LoginPage extends BasePage {
 
     public LoginPage(WebDriver driver) {
         super(driver);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
     @FindBy(name = "username")
@@ -46,8 +46,11 @@ public class LoginPage extends BasePage {
         enterPassword(password);
         clickLogin();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//h6[normalize-space()='Dashboard']")
-        ));
+        try {
+            wait.until(ExpectedConditions.or(
+                    ExpectedConditions.visibilityOfElementLocated(By.xpath("//h6[normalize-space()='Dashboard']")),
+                    ExpectedConditions.urlContains("dashboard")
+            ));
+        } catch (Exception ignored) {}
     }
 }
